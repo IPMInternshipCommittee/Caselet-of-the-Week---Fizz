@@ -11,10 +11,13 @@
     --sky:#cfe2f3;
     --cream:#eceef1;
     --ink:#1e293b;
+    --panel:#ffffff;
+    --line:#cbd5e1;
+    --slate:#64748b;
   }
   *{
     box-sizing:border-box;
-    font-family:Georgia,'Times New Roman',serif;
+    font-family:Georgia,'Times New Roman',serif !important;
   }
   html,body{
     margin:0;padding:0;height:100%;
@@ -73,6 +76,8 @@
   .pane.slidesMain{
     flex:1 1 100%;
     transition:flex-basis .25s ease;
+    background:var(--panel);
+    overflow-y:auto;
   }
 
   .pane.quizSide{
@@ -96,6 +101,7 @@
     display:flex;
     justify-content:space-between;
     align-items:center;
+    flex-shrink:0;
   }
   .pane-header a{
     color:var(--navy-2);
@@ -114,6 +120,114 @@
     background:#fff;
   }
 
+  /* --- Embedded Slides & Carousel Styling --- */
+  .slides-content-wrapper{
+    max-width:680px;
+    margin:0 auto;
+    padding:24px 20px;
+  }
+  .case-badge{
+    display:inline-block;
+    background:var(--sky);
+    color:var(--navy-2);
+    font-size:12px;
+    padding:4px 10px;
+    border-radius:3px;
+    margin-bottom:8px;
+    font-weight:bold;
+  }
+  .case-title{
+    font-size:22px;
+    color:var(--navy-2);
+    margin:0 0 6px;
+    line-height:1.3;
+  }
+  .case-subtitle{
+    font-size:13px;
+    color:var(--slate);
+    margin-bottom:20px;
+    line-height:1.5;
+  }
+  .carousel-container{
+    position:relative;
+    width:100%;
+    background:#0b1735;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    aspect-ratio: 16 / 9;
+  }
+  .carousel-slide{
+    display:none;
+    width:100%;
+    height:100%;
+  }
+  .carousel-slide.active{
+    display:block;
+  }
+  .carousel-slide img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+  }
+  .carousel-btn{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(255,255,255,0.85);
+    color:var(--navy);
+    border:none;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background 0.2s;
+    user-select:none;
+    z-index:2;
+  }
+  .carousel-btn:hover{ background:#ffffff; }
+  .carousel-btn.prev{ left:12px; }
+  .carousel-btn.next{ right:12px; }
+  
+  .carousel-dots{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:14px;
+  }
+  .dot{
+    width:8px;
+    height:8px;
+    background:#cbd5e1;
+    border-radius:50%;
+    cursor:pointer;
+    transition:background 0.2s;
+  }
+  .dot.active{
+    background:var(--navy-2);
+  }
+  .slide-counter{
+    text-align:center;
+    font-size:12px;
+    color:var(--slate);
+    margin-top:6px;
+  }
+  .case-footer-text{
+    font-size:13.5px;
+    color:var(--ink);
+    margin-top:24px;
+    line-height:1.6;
+  }
+
   @media only screen and (min-width:601px) and (max-width:1024px){
     .stage.quiz-open .pane.slidesMain{ flex:1 1 50%; }
     .stage.quiz-open .pane.quizSide{ flex:1 1 50%; width:auto; }
@@ -127,7 +241,6 @@
     .stage.quiz-open .pane.quizSide{ flex:1 1 50%; width:auto; }
     .topbar h1{ font-size:13px; }
     .pane-header{ font-size:11px; padding:5px 10px; }
-    .pane-header a{ font-size:10px; padding:2px 6px; }
     #quizToggle{ font-size:13px; padding:9px 20px; }
   }
 </style>
@@ -140,15 +253,55 @@
 
   <div class="stage" id="stage">
 
+    <!-- Native Slides Pane -->
     <div class="pane slidesMain">
       <div class="pane-header">
         <span>Case Slides</span>
       </div>
-      <iframe
-        src="https://emaahir2-spec.github.io/caselet-of-the-week/"
-        title="Caselet Carousel" loading="eager"></iframe>
+      
+      <div class="slides-content-wrapper">
+        <span class="case-badge">Caselet of the Week</span>
+        <h2 class="case-title">FIZZ: The Flat Sales Diagnostic</h2>
+        <div class="case-subtitle">IPM Internship Committee &times; gradnext &dash; swipe or use the arrows to read the full case.</div>
+
+        <div class="carousel-container" id="carousel">
+          <button class="carousel-btn prev" id="prevSlide" aria-label="Previous slide">&#8592;</button>
+          
+          <div class="carousel-slide active">
+            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 1">
+          </div>
+          <div class="carousel-slide">
+            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 2">
+          </div>
+          <div class="carousel-slide">
+            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 3">
+          </div>
+          <div class="carousel-slide">
+            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 4">
+          </div>
+          <div class="carousel-slide">
+            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 5">
+          </div>
+
+          <button class="carousel-btn next" id="nextSlide" aria-label="Next slide">&#8594;</button>
+        </div>
+
+        <div class="carousel-dots" id="dotsContainer">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+        <div class="slide-counter" id="slideNum">Slide 1 of 5</div>
+
+        <p class="case-footer-text">
+          Read through all five slides above, then take the quiz to test how well you diagnosed the case.
+        </p>
+      </div>
     </div>
 
+    <!-- Quiz Pane -->
     <div class="pane quizSide">
       <div class="pane-header">
         <span>Quiz</span>
@@ -167,6 +320,7 @@
   </div>
 
   <script>
+    // --- Layout Split Toggle ---
     const stage = document.getElementById('stage');
     const btn = document.getElementById('quizToggle');
     const quizFrame = document.getElementById('quizFrame');
@@ -183,6 +337,26 @@
       btn.textContent = isOpen ? '✕ Hide Quiz' : '📝 Take the Quiz';
       btn.classList.toggle('open', isOpen);
     });
+
+    // --- Embedded Carousel Logic ---
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.dot');
+    const slideNum = document.getElementById('slideNum');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+      if (index >= slides.length) currentSlide = 0;
+      else if (index < 0) currentSlide = slides.length - 1;
+      else currentSlide = index;
+
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+      slideNum.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+    }
+
+    document.getElementById('nextSlide').addEventListener('click', () => showSlide(currentSlide + 1));
+    document.getElementById('prevSlide').addEventListener('click', () => showSlide(currentSlide - 1));
+    dots.forEach((dot, idx) => dot.addEventListener('click', () => showSlide(idx)));
   </script>
 
 </body>
