@@ -1,91 +1,421 @@
-<script>
-  // --- Split Pane Layout Toggle ---
-  const stage = document.getElementById('stage');
-  const btn = document.getElementById('quizToggle');
-  const quizFrame = document.getElementById('quizFrame');
-  let quizLoaded = false;
-
-  btn.addEventListener('click', () => {
-    const isOpen = stage.classList.toggle('quiz-open');
-
-    if (isOpen && !quizLoaded) {
-      quizFrame.src = quizFrame.dataset.src;
-      quizLoaded = true;
-    }
-
-    btn.textContent = isOpen ? '✕ Hide Quiz' : '📝 Take the Quiz';
-    btn.classList.toggle('open', isOpen);
-  });
-
-  // --- Embedded Carousel Navigation ---
-  const slides = document.querySelectorAll('.carousel-slide');
-  const dots = document.querySelectorAll('.dot');
-  const slideNum = document.getElementById('slideNum');
-  const carouselEl = document.getElementById('carousel');
-  let currentSlide = 0;
-
-  function showSlide(index) {
-    if (index >= slides.length) currentSlide = 0;
-    else if (index < 0) currentSlide = slides.length - 1;
-    else currentSlide = index;
-
-    slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
-    dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-    slideNum.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caselet of the Week: Case Slides</title>
+<style>
+  :root{
+    --navy:#0b1735;
+    --navy-2:#073763;
+    --sky:#cfe2f3;
+    --cream:#eceef1;
+    --ink:#1e293b;
+    --panel:#ffffff;
+    --line:#cbd5e1;
+    --slate:#64748b;
+  }
+  *{
+    box-sizing:border-box;
+    font-family:Georgia,'Times New Roman',serif !important;
+  }
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--cream);
+    color:var(--ink);
   }
 
-  document.getElementById('nextSlide').addEventListener('click', (e) => {
-    e.stopPropagation();
-    showSlide(currentSlide + 1);
-  });
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;
+    background:var(--navy);
+    color:#fff;
+    padding:10px 18px;
+    flex-wrap:wrap;
+  }
+  .topbar h1{
+    font-size:15px;margin:0 auto;font-weight:bold;letter-spacing:.3px;
+  }
 
-  document.getElementById('prevSlide').addEventListener('click', (e) => {
-    e.stopPropagation();
-    showSlide(currentSlide - 1);
-  });
+  .bottombar{
+    display:flex;align-items:center;justify-content:center;
+    background:var(--navy);
+    padding:10px 18px;
+    flex-shrink:0;
+  }
+  #quizToggle{
+    border:none;background:var(--sky);color:var(--navy-2);
+    font-size:14px;font-weight:bold;
+    padding:10px 26px;border-radius:8px;cursor:pointer;
+    white-space:nowrap;
+    transition:background .15s ease,transform .1s ease;
+  }
+  #quizToggle:hover{ background:#e2eefb; }
+  #quizToggle:active{ transform:scale(0.97); }
+  #quizToggle.open{ background:#ffffff; }
 
-  dots.forEach((dot, idx) => {
-    dot.addEventListener('click', () => showSlide(idx));
-  });
+  body{
+    display:flex;
+    flex-direction:column;
+  }
+  .stage{
+    display:flex;
+    flex:1;
+    min-height:0;
+    width:100%;
+  }
+  .pane{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    border-right:1px solid #d7dbe2;
+  }
+  .pane:last-child{ border-right:none; }
 
-  // --- 1. Two-Finger Laptop Trackpad Swipe (No Clicking Required) ---
-  let wheelDebounce = false;
-  carouselEl.addEventListener('wheel', (e) => {
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 25) {
-      e.preventDefault();
-      if (wheelDebounce) return;
+  .pane.slidesMain{
+    flex:1 1 100%;
+    transition:flex-basis .25s ease;
+    background:var(--panel);
+    overflow-y:auto;
+  }
+
+  .pane.quizSide{
+    flex:0 0 0%;
+    width:0;
+    overflow:hidden;
+    transition:flex-basis .25s ease;
+  }
+
+  .stage.quiz-open .pane.slidesMain{ flex:1 1 55%; }
+  .stage.quiz-open .pane.quizSide{ flex:1 1 45%; width:auto; }
+
+  .pane-header{
+    background:var(--sky);
+    color:var(--navy-2);
+    font-size:12.5px;
+    font-weight:bold;
+    padding:6px 12px;
+    letter-spacing:.3px;
+    text-transform:uppercase;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-shrink:0;
+  }
+  .pane-header a{
+    color:var(--navy-2);
+    font-size:11px;
+    text-decoration:none;
+    border:1px solid var(--navy-2);
+    border-radius:5px;
+    padding:2px 7px;
+  }
+  .pane-header a:hover{ background:var(--navy-2); color:#fff; }
+
+  iframe{
+    flex:1;
+    width:100%;
+    border:none;
+    background:#fff;
+  }
+
+  /* --- Carousel & Slide Styling --- */
+  .slides-content-wrapper{
+    max-width:680px;
+    margin:0 auto;
+    padding:24px 20px;
+  }
+  .case-badge{
+    display:inline-block;
+    background:var(--sky);
+    color:var(--navy-2);
+    font-size:12px;
+    padding:4px 10px;
+    border-radius:3px;
+    margin-bottom:8px;
+    font-weight:bold;
+  }
+  .case-title{
+    font-size:22px;
+    color:var(--navy-2);
+    margin:0 0 6px;
+    line-height:1.3;
+  }
+  .case-subtitle{
+    font-size:13px;
+    color:var(--slate);
+    margin-bottom:20px;
+    line-height:1.5;
+  }
+  .carousel-container{
+    position:relative;
+    width:100%;
+    background:#ffffff;
+    border:1px solid #d7dbe2;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    aspect-ratio: 16 / 9;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .carousel-slide{
+    display:none;
+    width:100%;
+    height:100%;
+  }
+  .carousel-slide.active{
+    display:block;
+  }
+  .carousel-slide img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+  .carousel-btn{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(255,255,255,0.9);
+    color:var(--navy);
+    border:1px solid #d7dbe2;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background 0.2s, transform 0.1s;
+    user-select:none;
+    z-index:10;
+  }
+  .carousel-btn:hover{ background:#ffffff; }
+  .carousel-btn:active{ transform:translateY(-50%) scale(0.95); }
+  .carousel-btn.prev{ left:12px; }
+  .carousel-btn.next{ right:12px; }
+  
+  .carousel-dots{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:14px;
+  }
+  .dot{
+    width:8px;
+    height:8px;
+    background:#cbd5e1;
+    border-radius:50%;
+    cursor:pointer;
+    transition:background 0.2s;
+  }
+  .dot.active{
+    background:var(--navy-2);
+  }
+  .slide-counter{
+    text-align:center;
+    font-size:12px;
+    color:var(--slate);
+    margin-top:6px;
+  }
+  .case-footer-text{
+    font-size:13.5px;
+    color:var(--ink);
+    margin-top:24px;
+    line-height:1.6;
+  }
+
+  @media only screen and (min-width:601px) and (max-width:1024px){
+    .stage.quiz-open .pane.slidesMain{ flex:1 1 50%; }
+    .stage.quiz-open .pane.quizSide{ flex:1 1 50%; width:auto; }
+    .pane-header{ font-size:12px; padding:6px 10px; }
+    #quizToggle{ font-size:13px; padding:9px 22px; }
+  }
+
+  @media only screen and (max-width:600px){
+    .stage.quiz-open{ flex-direction:column; }
+    .stage.quiz-open .pane.slidesMain{ flex:1 1 50%; border-right:none; border-bottom:1px solid #d7dbe2; }
+    .stage.quiz-open .pane.quizSide{ flex:1 1 50%; width:auto; }
+    .topbar h1{ font-size:13px; }
+    .pane-header{ font-size:11px; padding:5px 10px; }
+    #quizToggle{ font-size:13px; padding:9px 20px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <h1>Caselet of the Week &nbsp;|&nbsp; FIZZ: The Flat Sales Diagnostic</h1>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <div class="pane slidesMain">
+      <div class="pane-header">
+        <span>Case Slides</span>
+      </div>
       
-      wheelDebounce = true;
-      if (e.deltaX > 0) {
-        showSlide(currentSlide + 1); // Trackpad swipe left -> Next
-      } else {
-        showSlide(currentSlide - 1); // Trackpad swipe right -> Prev
+      <div class="slides-content-wrapper">
+        <span class="case-badge">Caselet of the Week</span>
+        <h2 class="case-title">FIZZ: The Flat Sales Diagnostic</h2>
+        <div class="case-subtitle">IPM Internship Committee &times; gradnext - swipe or use the arrows to read the full case.</div>
+
+        <div class="carousel-container" id="carousel">
+          <button class="carousel-btn prev" id="prevSlide" aria-label="Previous slide">&#8592;</button>
+          
+          <div class="carousel-slide active">
+            <img src="./1.png" alt="Slide 1">
+          </div>
+          <div class="carousel-slide">
+            <img src="./2.png" alt="Slide 2">
+          </div>
+          <div class="carousel-slide">
+            <img src="./3.png" alt="Slide 3">
+          </div>
+          <div class="carousel-slide">
+            <img src="./4.png" alt="Slide 4">
+          </div>
+          <div class="carousel-slide">
+            <img src="./5.png" alt="Slide 5">
+          </div>
+
+          <button class="carousel-btn next" id="nextSlide" aria-label="Next slide">&#8594;</button>
+        </div>
+
+        <div class="carousel-dots" id="dotsContainer">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+        <div class="slide-counter" id="slideNum">Slide 1 of 5</div>
+
+        <p class="case-footer-text">
+          Read through all five slides above, then take the quiz to test how well you diagnosed the case.
+        </p>
+      </div>
+    </div>
+
+    <div class="pane quizSide">
+      <div class="pane-header">
+        <span>Quiz</span>
+        <a href="https://ipminternshipcommittee.github.io/Caselet-of-the-Week---Fizz/quiz/index.html" target="_blank" rel="noopener">Open ↗</a>
+      </div>
+      <iframe
+        id="quizFrame"
+        data-src="https://ipminternshipcommittee.github.io/Caselet-of-the-Week---Fizz/quiz/index.html"
+        title="Caselet Quiz" loading="lazy"></iframe>
+    </div>
+
+  </div>
+
+  <div class="bottombar">
+    <button id="quizToggle">📝 Take the Quiz</button>
+  </div>
+
+  <script>
+    // --- Split Pane Layout Toggle ---
+    const stage = document.getElementById('stage');
+    const btn = document.getElementById('quizToggle');
+    const quizFrame = document.getElementById('quizFrame');
+    let quizLoaded = false;
+
+    btn.addEventListener('click', () => {
+      const isOpen = stage.classList.toggle('quiz-open');
+
+      if (isOpen && !quizLoaded) {
+        quizFrame.src = quizFrame.dataset.src;
+        quizLoaded = true;
       }
-      
-      setTimeout(() => { wheelDebounce = false; }, 400);
+
+      btn.textContent = isOpen ? '✕ Hide Quiz' : '📝 Take the Quiz';
+      btn.classList.toggle('open', isOpen);
+    });
+
+    // --- Embedded Carousel Navigation ---
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.dot');
+    const slideNum = document.getElementById('slideNum');
+    const carouselEl = document.getElementById('carousel');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+      if (index >= slides.length) currentSlide = 0;
+      else if (index < 0) currentSlide = slides.length - 1;
+      else currentSlide = index;
+
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+      slideNum.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
     }
-  }, { passive: false });
 
-  // --- 2. Mobile Touch Screen Swipe ---
-  let touchStartX = 0;
-  let touchStartY = 0;
+    document.getElementById('nextSlide').addEventListener('click', (e) => {
+      e.stopPropagation();
+      showSlide(currentSlide + 1);
+    });
 
-  carouselEl.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
+    document.getElementById('prevSlide').addEventListener('click', (e) => {
+      e.stopPropagation();
+      showSlide(currentSlide - 1);
+    });
 
-  carouselEl.addEventListener('touchend', (e) => {
-    const diffX = touchStartX - e.changedTouches[0].clientX;
-    const diffY = touchStartY - e.changedTouches[0].clientY;
-    const threshold = 35;
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', () => showSlide(idx));
+    });
 
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
-      if (diffX > 0) {
-        showSlide(currentSlide + 1); // Mobile swipe left -> Next
-      } else {
-        showSlide(currentSlide - 1); // Mobile swipe right -> Prev
+    // --- Two-Finger Laptop Trackpad Swipe ---
+    let wheelDebounce = false;
+    carouselEl.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 25) {
+        e.preventDefault();
+        if (wheelDebounce) return;
+        
+        wheelDebounce = true;
+        if (e.deltaX > 0) {
+          showSlide(currentSlide + 1);
+        } else {
+          showSlide(currentSlide - 1);
+        }
+        
+        setTimeout(() => { wheelDebounce = false; }, 400);
       }
-    }
-  }, { passive: true });
-</script>
+    }, { passive: false });
+
+    // --- Mobile Touch Screen Swipe ---
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    carouselEl.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    carouselEl.addEventListener('touchend', (e) => {
+      const diffX = touchStartX - e.changedTouches[0].clientX;
+      const diffY = touchStartY - e.changedTouches[0].clientY;
+      const threshold = 35;
+
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+        if (diffX > 0) {
+          showSlide(currentSlide + 1);
+        } else {
+          showSlide(currentSlide - 1);
+        }
+      }
+    }, { passive: true });
+  </script>
+
+</body>
+</html>
