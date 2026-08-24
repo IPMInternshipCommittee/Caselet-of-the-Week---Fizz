@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Caselet of the Week: Why Did Beverage Revenue Decline?</title>
+<style>
+  :root{
+    --ink:#1e293b;
+    --navy:#073763;
+    --paper:#f2f1f6;
+    --panel:#ffffff;
+    --line:#cbd5e1;
+    --lightblue:#cfe2f3;
+    --accent:#5846c8;
+    --slate:#64748b;
+    --good:#16663f;
+    --good-bg:#d1f5df;
+    --bad:#a3281b;
+    --bad-bg:#fde2e1;
+  }
+
+  /* --- Force Georgia on every element --- */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    font-family: Georgia, 'Times New Roman', serif !important;
+  }
+
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.55;
+  }
+  .wrap{max-width:640px;margin:0 auto;background:var(--panel);}
+
+  .header{padding:20px 24px 0;}
+  .badge-row{margin-bottom:8px;}
+  .badge{
+    display:inline-block;
+    background:var(--lightblue);
+    color:var(--navy);
+    font-size:12px;
+    letter-spacing:.02em;
+    padding:4px 10px;
+    border-radius:3px;
+  }
+  h1{
+    font-size:24px;
+    line-height:1.25;
+    color:var(--navy);
+    margin:6px 0 8px;
+  }
+  .byline{
+    font-size:12.5px;
+    color:var(--slate);
+    margin-bottom:18px;
+    padding-bottom:18px;
+    border-bottom:1px solid var(--line);
+  }
+
+  .lede{padding:0 24px;}
+  .lede p{font-size:14px;margin:0 0 12px;}
+  .framework{
+    font-size:16px;
+    font-weight:bold;
+    color:var(--navy);
+    margin:16px 0 12px;
+  }
+  .prompts{margin:0 0 26px;padding-left:18px;}
+  .prompts li{font-size:13px;margin-bottom:6px;}
+  .prompts strong{color:var(--navy);}
+
+  /* --- progress --- */
+  .progress-shell{padding:0 24px;margin-bottom:6px;}
+  .progress-track{
+    height:4px;
+    background:var(--lightblue);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:var(--navy);
+    transition:width .35s ease;
+  }
+  .progress-label{
+    font-size:11px;
+    color:var(--slate);
+    margin:6px 0 20px;
+  }
+
+  /* --- quiz card --- */
+  .quizwrap{padding:0 24px;}
+  .card{
+    border-top:1px solid var(--line);
+    padding:20px 0;
+  }
+  .qcount{
+    font-size:12.5px;
+    color:var(--slate);
+    margin-bottom:4px;
+  }
+  .qtext{
+    font-weight:bold;
+    font-size:15px;
+    margin:0 0 12px;
+    color:var(--ink);
+  }
+
+  .css-quiz-group{margin:0 0 8px;font-size:13px;}
+  .css-quiz-opt{
+    display:flex;
+    align-items:stretch;
+    width:100%;
+    text-align:left;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:10px 12px;
+    margin-bottom:6px;
+    font-size:13px;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s ease, background-color .15s ease;
+  }
+  .css-quiz-opt:hover:not(:disabled){border-color:var(--navy);}
+  .css-quiz-opt:disabled{cursor:default;}
+  .css-quiz-opt.correct{background:var(--good-bg);color:var(--good);font-weight:bold;border-color:var(--good);}
+  .css-quiz-opt.wrong{background:var(--bad-bg);color:var(--bad);font-weight:bold;border-color:var(--bad);}
+  .css-quiz-opt.dim{opacity:.55;}
+
+  .feedback{display:none;font-size:13px;color:#334155;}
+  .feedback.show{display:block;}
+  .feedback .why{margin:10px 0 10px;}
+  .feedback .why strong{color:var(--ink);}
+  .learnt{
+    background:#f8fafc;
+    border-left:3px solid var(--accent);
+    padding:8px 10px;
+  }
+  .learnt strong{display:block;color:var(--ink);margin-bottom:2px;}
+
+  .navrow{text-align:right;margin-top:14px;}
+  .nextbtn,.prevbtn{
+    font-size:13px;
+    border:none;
+    padding:9px 18px;
+    border-radius:4px;
+    cursor:pointer;
+    transition:background-color .15s ease;
+  }
+  .nextbtn{background:var(--navy);color:#fff;}
+  .nextbtn:hover:not(:disabled){background:#0d4a7d;}
+  .nextbtn:disabled{opacity:.4;cursor:default;}
+  .prevbtn{background:#fff;color:var(--navy);border:1px solid var(--line);margin-right:8px;}
+  .prevbtn:hover:not(:disabled){border-color:var(--navy);}
+  .prevbtn:disabled{opacity:.4;cursor:default;}
+
+  /* --- results --- */
+  .results{display:none;padding:0 24px 8px;}
+  .results.show{display:block;}
+  .score-hero{
+    text-align:center;
+    padding:22px 16px;
+    background:var(--lightblue);
+    border-radius:6px;
+    margin:20px 0 24px;
+  }
+  .score-eyebrow{
+    font-size:11.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--navy);
+    margin-bottom:6px;
+  }
+  .score-num{
+    font-size:34px;
+    font-weight:bold;
+    color:var(--navy);
+  }
+  .rank-title{
+    display:inline-block;
+    margin-top:8px;
+    font-size:13px;
+    font-weight:bold;
+    letter-spacing:.02em;
+    color:var(--accent);
+    background:#fff;
+    border:1px solid var(--accent);
+    border-radius:3px;
+    padding:4px 12px;
+  }
+  .score-sub{
+    font-size:13px;
+    color:#1e3a5f;
+    margin-top:10px;
+  }
+
+  .recap-title{
+    text-align:center;
+    font-size:18px;
+    color:var(--navy);
+    margin:0 0 14px;
+  }
+  table.recap{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+    margin-bottom:8px;
+  }
+  table.recap th,table.recap td{
+    border:1px solid var(--line);
+    padding:6px 8px;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.recap th{
+    font-weight:bold;
+    background:#f8fafc;
+    width:32%;
+    color:var(--navy);
+  }
+
+  .signoff{
+    padding:20px 24px;
+    font-size:13px;
+    color:#1e293b;
+  }
+  .signoff strong{display:block;margin-bottom:2px;}
+
+  @media (max-width:480px){
+    h1{font-size:20px;}
+    .score-num{font-size:28px;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="badge-row"><span class="badge">Caselet of the Week</span></div>
+    <h1>Why Did Beverage Revenue Decline?</h1>
+  </div>
+
+  <div class="lede" id="lede">
+    <p>This caselet works through a beverage company's revenue decline using a simple four-step framework: understand the problem, locate it, diagnose the cause, and recommend a fix.</p>
+    <p>Not every area needs equal attention. Focus first on where the problem actually lies.</p>
+
+    <div class="framework">Understand the Problem &rarr; Identify Where It Exists &rarr; Understand Why It Happened &rarr; Solve the Problem</div>
+
+    <ul class="prompts">
+      <li><strong>Where is the problem?</strong> Identify the specific business area driving the issue.</li>
+      <li><strong>Why is it happening?</strong> Use data to uncover the root cause rather than relying on assumptions.</li>
+      <li><strong>How should it be solved?</strong> Recommend solutions that address both the immediate issue and the underlying cause.</li>
+    </ul>
+  </div>
+
+  <div class="progress-shell">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">Question 1 of 8</div>
+  </div>
+
+  <div class="quizwrap" id="quiz"></div>
+
+  <div class="results" id="results">
+    <div class="score-hero">
+      <div class="score-eyebrow">Case complete</div>
+      <div class="score-num"><span id="scoreVal">0</span>/8</div>
+      <div class="rank-title" id="rankTitle"></div>
+      <div class="score-sub" id="scoreMsg"></div>
+    </div>
+
+    <h2 class="recap-title">Did you get it right?</h2>
+    <table class="recap">
+      <tr><th>Concept</th><th>What you learnt</th></tr>
+      <tr><td>Issue Tree</td><td>Breaking a broad business problem into smaller, structured components to identify where the issue lies.</td></tr>
+      <tr><td>Revenue Drivers</td><td>Revenue = Price &times; Volume. Understanding both drivers helps identify whether changes in revenue are caused by pricing, customer demand, or both.</td></tr>
+      <tr><td>Cannibalisation</td><td>When one product within the same company takes customers away from another product instead of generating additional demand.</td></tr>
+      <tr><td>Root Cause Analysis</td><td>Looking beyond the symptom to identify the underlying reason a business problem occurred.</td></tr>
+      <tr><td>KPIs</td><td>Performance metrics influence employee decisions. Poorly designed KPIs can unintentionally create business problems.</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "What should the consulting team investigate first?",
+    opts: [
+      "Increase beverage sales volume",
+      "Identify why beverage revenue is declining and recommend actions to restore revenue",
+      "Launch a new beverage category",
+      "Reduce supplier costs"
+    ],
+    correct: 1,
+    why: "The client has approached the consulting team to understand the reason behind the revenue decline and recommend solutions to improve business performance.",
+    learnt: "Before solving a problem, always define what success looks like for the client."
+  },
+  {
+    q: "Before analyzing the business, which of the following questions would be most useful to ask the client?",
+    opts: [
+      "Has the competitive landscape changed?",
+      "What is the objective of the engagement?",
+      "Over what time period has revenue declined?",
+      "All of the above"
+    ],
+    correct: 3,
+    why: "Consultants begin by understanding the business context before analysing data. Clarifying the objective, timeline, and external environment prevents incorrect assumptions.",
+    learnt: "Good consulting starts with asking the right questions, not jumping to solutions."
+  },
+  {
+    q: "Based on the information above, which category should be investigated first?",
+    opts: ["Waters", "Other Beverages", "Sodas", "All categories equally"],
+    correct: 2,
+    why: "The decline is concentrated within the Soda category. Consultants focus first on the area driving the business problem before expanding the analysis.",
+    learnt: "Don't analyse everything equally. Prioritise the area where the problem exists."
+  },
+  {
+    q: "Which conclusion is best supported by the data?",
+    opts: [
+      "Customers purchased less soda",
+      "The decline in average selling price outweighed the increase in sales volume, resulting in lower revenue",
+      "Revenue always increases when volume increases",
+      "The beverage market is shrinking"
+    ],
+    correct: 1,
+    why: "Although soda sales volume increased, the average selling price declined significantly. The reduction in price had a greater impact than the increase in volume, resulting in lower revenue.",
+    learnt: "Revenue depends on both price and volume. Looking at only one metric can lead to incorrect conclusions."
+  },
+  {
+    q: "Which conclusion is best supported by the data?",
+    opts: [
+      "Customers stopped purchasing soda",
+      "Customers shifted from Brand A to the lower-priced Value Brand",
+      "Brand B became the market leader",
+      "Customers switched to water"
+    ],
+    correct: 1,
+    why: "The shift in mix from Brand A to Value Brand, driven by the price cut, explains both the volume increase and the revenue decline.",
+    learnt: "A change in customer mix can move volume and revenue in opposite directions."
+  },
+  {
+    q: "Customers shifted from Brand A to Value Brand after the price reduction. This is an example of:",
+    opts: ["Market Expansion", "Cannibalisation", "Product Diversification", "Customer Acquisition"],
+    correct: 1,
+    why: "Existing Brand A customers moved to Value Brand rather than new customers entering the category, so the company took share from itself.",
+    learnt: "Cannibalisation can make volume look healthy while revenue quietly declines."
+  },
+  {
+    q: "Which of the following best represents the root cause of the problem?",
+    opts: [
+      "Revenue declined",
+      "Customers became more price-sensitive",
+      "The pricing policy automatically reduced prices while performance incentives rewarded only volume growth",
+      "Brand A lost customers"
+    ],
+    correct: 2,
+    why: "The underlying policy design created the incentive to cut price for volume, which is what triggered the shift to Value Brand and the resulting revenue decline.",
+    learnt: "The root cause is usually a system or incentive design issue, not the symptom itself."
+  },
+  {
+    q: "Which recommendation best addresses the root cause identified?",
+    opts: [
+      "Increase discounts on Brand A",
+      "Reduce supplier costs further",
+      "Increase the price through a pilot, redesign KPIs, and strengthen pricing governance",
+      "Launch additional beverage categories"
+    ],
+    correct: 2,
+    why: "Addressing the root cause requires fixing the pricing policy and incentive structure, not just treating the symptom of low price.",
+    learnt: "A good recommendation targets the root cause, not just the visible symptom."
+  }
+];
+
+const LETTERS = ["A","B","C","D"];
+let current = 0;
+const answers = new Array(QUESTIONS.length).fill(null);
+
+const quizEl = document.getElementById('quiz');
+const fill = document.getElementById('progressFill');
+const label = document.getElementById('progressLabel');
+
+function getScore(){
+  return answers.reduce((sum, sel, idx) => sum + (sel === QUESTIONS[idx].correct ? 1 : 0), 0);
+}
+
+function updateProgress(){
+  const pct = current < QUESTIONS.length ? (current / QUESTIONS.length) * 100 : 100;
+  fill.style.width = pct + '%';
+  label.textContent = current < QUESTIONS.length
+    ? `Question ${current+1} of ${QUESTIONS.length}`
+    : `Complete: ${QUESTIONS.length} of ${QUESTIONS.length}`;
+}
+
+function renderQuestion(){
+  updateProgress();
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('lede').style.display = current === 0 ? '' : 'none';
+  const item = QUESTIONS[current];
+  const answered = answers[current];
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="qcount">Question ${current+1} of ${QUESTIONS.length}</div>
+    <div class="qtext">${item.q}</div>
+    <div class="css-quiz-group"></div>
+    <div class="feedback">
+      <div class="why"><strong>Explanation:</strong> ${item.why}</div>
+      <div class="learnt"><strong>Takeaway:</strong> ${item.learnt}</div>
+    </div>
+    <div class="navrow">
+      <button class="prevbtn" type="button" ${current === 0 ? "disabled" : ""}>Previous</button>
+      <button class="nextbtn" type="button" ${answered === null ? "disabled" : ""}>${current === QUESTIONS.length-1 ? "See results" : "Next question"}</button>
+    </div>
+  `;
+
+  const group = card.querySelector('.css-quiz-group');
+  item.opts.forEach((text, i)=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'css-quiz-opt';
+    btn.textContent = `${LETTERS[i]}. ${text}`;
+    if(answered === null){
+      btn.addEventListener('click', ()=> selectOption(i, card));
+    } else {
+      btn.disabled = true;
+      if(i === item.correct) btn.classList.add('correct');
+      else if(i === answered) btn.classList.add('wrong');
+      else btn.classList.add('dim');
+    }
+    group.appendChild(btn);
+  });
+
+  if(answered !== null){
+    card.querySelector('.feedback').classList.add('show');
+  }
+
+  card.querySelector('.prevbtn').addEventListener('click', ()=>{
+    if(current > 0){
+      current--;
+      renderQuestion();
+    }
+  });
+  card.querySelector('.nextbtn').addEventListener('click', ()=>{
+    current++;
+    if(current < QUESTIONS.length){
+      renderQuestion();
+    } else {
+      showResults();
+    }
+  });
+
+  quizEl.innerHTML = '';
+  quizEl.appendChild(card);
+}
+
+function selectOption(i, card){
+  const item = QUESTIONS[current];
+  answers[current] = i;
+  const opts = card.querySelectorAll('.css-quiz-opt');
+  opts.forEach((btn, idx)=>{
+    btn.disabled = true;
+    if(idx === item.correct) btn.classList.add('correct');
+    else if(idx === i) btn.classList.add('wrong');
+    else btn.classList.add('dim');
+  });
+
+  card.querySelector('.feedback').classList.add('show');
+  card.querySelector('.nextbtn').disabled = false;
+}
+
+function getRankTitle(score){
+  if(score === 8) return "CasedIt!";
+  if(score >= 6) return "Sharp Analyst";
+  if(score >= 4) return "Budding Consultant";
+  return "Case Rookie";
+}
+
+function showResults(){
+  updateProgress();
+  quizEl.innerHTML = '';
+  document.getElementById('results').classList.add('show');
+  const score = getScore();
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('rankTitle').textContent = getRankTitle(score);
+  const msgEl = document.getElementById('scoreMsg');
+  let msg;
+  if(score === 8) msg = "Full marks. You traced the case from symptom to root cause without missing a step.";
+  else if(score >= 6) msg = "Strong case sense. Revisit the misses above to sharpen the diagnosis further.";
+  else if(score >= 4) msg = "A solid start. Review the recap below to reinforce the framework before the next caselet.";
+  else msg = "Worth a second pass. Walk back through the reasoning in each explanation above.";
+  msgEl.textContent = msg;
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
