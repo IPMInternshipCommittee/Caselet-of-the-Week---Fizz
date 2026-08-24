@@ -114,13 +114,10 @@
     background:#fff;
   }
 
-  /* ===== LAPTOP / DESKTOP (default, >1024px) =====
-     Side-by-side split, slides slightly wider than the quiz:
-     see .stage.quiz-open rules above (55% / 45%). */
+  /* ===== LAPTOP / DESKTOP (default, >1024px) ===== */
+  /* Split view managed by .stage.quiz-open */
 
-  /* ===== TABLET (601px–1024px) =====
-     Still side-by-side, but closer to an even split since
-     there's less horizontal room to spare than on a laptop. */
+  /* ===== TABLET (601px–1024px) ===== */
   @media only screen and (min-width:601px) and (max-width:1024px){
     .stage.quiz-open .pane.slidesMain{ flex:1 1 50%; }
     .stage.quiz-open .pane.quizSide{ flex:1 1 50%; width:auto; }
@@ -128,9 +125,7 @@
     #quizToggle{ font-size:13px; padding:9px 22px; }
   }
 
-  /* ===== PHONE (≤600px) =====
-     Side-by-side doesn't work at this width, so stack the
-     panes vertically instead when the quiz is open. */
+  /* ===== PHONE (≤600px) ===== */
   @media only screen and (max-width:600px){
     .stage.quiz-open{ flex-direction:column; }
     .stage.quiz-open .pane.slidesMain{ flex:1 1 50%; border-right:none; border-bottom:1px solid #d7dbe2; }
@@ -163,11 +158,11 @@
     <div class="pane quizSide">
       <div class="pane-header">
         <span>Quiz</span>
-        <a href="./quiz/" target="_blank" rel="noopener">Open ↗</a>
+        <a href="https://ipminternshipcommittee.github.io/Caselet-of-the-Week---Fizz/quiz/index.html" target="_blank" rel="noopener">Open ↗</a>
       </div>
       <iframe
         id="quizFrame"
-        data-src="./quiz/"
+        data-src="https://ipminternshipcommittee.github.io/Caselet-of-the-Week---Fizz/quiz/index.html"
         title="Caselet Quiz" loading="lazy"></iframe>
     </div>
 
