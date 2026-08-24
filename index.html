@@ -156,30 +156,38 @@
     border-radius:8px;
     overflow:hidden;
     box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    aspect-ratio: 16 / 9;
+  }
+  .track{
+    display:flex;
+    width:100%;
+    height:100%;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    scroll-behavior:smooth;
+  }
+  .track::-webkit-scrollbar{
+    display:none;
+  }
+  .slide{
+    flex:0 0 100%;
+    width:100%;
+    height:100%;
+    scroll-snap-align:center;
     display:flex;
     align-items:center;
     justify-content:center;
-    aspect-ratio: 16 / 9;
-    touch-action: pan-y;
-    user-select: none;
-    -webkit-user-select: none;
   }
-  .carousel-slide{
-    display:none;
-    width:100%;
-    height:100%;
-  }
-  .carousel-slide.active{
-    display:block;
-  }
-  .carousel-slide img{
+  .slide img{
     width:100%;
     height:100%;
     object-fit:contain;
     display:block;
-    pointer-events: none;
-    -webkit-user-drag: none;
-    user-select: none;
+    pointer-events:none;
+    -webkit-user-drag:none;
+    user-select:none;
   }
   .carousel-btn{
     position:absolute;
@@ -197,12 +205,16 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    transition:background 0.2s, transform 0.1s;
+    transition:background 0.2s, opacity 0.2s, transform 0.1s;
     user-select:none;
     z-index:10;
   }
-  .carousel-btn:hover{ background:#ffffff; }
-  .carousel-btn:active{ transform:translateY(-50%) scale(0.95); }
+  .carousel-btn:hover:not(:disabled){ background:#ffffff; }
+  .carousel-btn:active:not(:disabled){ transform:translateY(-50%) scale(0.95); }
+  .carousel-btn:disabled{
+    opacity:0.35;
+    cursor:not-allowed;
+  }
   .carousel-btn.prev{ left:12px; }
   .carousel-btn.next{ right:12px; }
   
@@ -272,25 +284,27 @@
         <div class="case-subtitle">IPM Internship Committee &times; gradnext - swipe or use the arrows to read the full case.</div>
 
         <div class="carousel-container" id="carousel">
-          <button class="carousel-btn prev" id="prevSlide" aria-label="Previous slide">&#8592;</button>
+          <button class="carousel-btn prev" id="prevBtn" aria-label="Previous slide">&#8592;</button>
           
-          <div class="carousel-slide active">
-            <img src="./1.png" alt="Slide 1">
-          </div>
-          <div class="carousel-slide">
-            <img src="./2.png" alt="Slide 2">
-          </div>
-          <div class="carousel-slide">
-            <img src="./3.png" alt="Slide 3">
-          </div>
-          <div class="carousel-slide">
-            <img src="./4.png" alt="Slide 4">
-          </div>
-          <div class="carousel-slide">
-            <img src="./5.png" alt="Slide 5">
+          <div class="track" id="track">
+            <div class="slide">
+              <img src="./1.png" alt="Slide 1">
+            </div>
+            <div class="slide">
+              <img src="./2.png" alt="Slide 2">
+            </div>
+            <div class="slide">
+              <img src="./3.png" alt="Slide 3">
+            </div>
+            <div class="slide">
+              <img src="./4.png" alt="Slide 4">
+            </div>
+            <div class="slide">
+              <img src="./5.png" alt="Slide 5">
+            </div>
           </div>
 
-          <button class="carousel-btn next" id="nextSlide" aria-label="Next slide">&#8594;</button>
+          <button class="carousel-btn next" id="nextBtn" aria-label="Next slide">&#8594;</button>
         </div>
 
         <div class="carousel-dots" id="dotsContainer">
@@ -328,11 +342,11 @@
   <script>
     // --- Split Pane Layout Toggle ---
     const stage = document.getElementById('stage');
-    const btn = document.getElementById('quizToggle');
+    const quizToggleBtn = document.getElementById('quizToggle');
     const quizFrame = document.getElementById('quizFrame');
     let quizLoaded = false;
 
-    btn.addEventListener('click', () => {
+    quizToggleBtn.addEventListener('click', () => {
       const isOpen = stage.classList.toggle('quiz-open');
 
       if (isOpen && !quizLoaded) {
@@ -340,81 +354,72 @@
         quizLoaded = true;
       }
 
-      btn.textContent = isOpen ? '✕ Hide Quiz' : '📝 Take the Quiz';
-      btn.classList.toggle('open', isOpen);
+      quizToggleBtn.textContent = isOpen ? '✕ Hide Quiz' : '📝 Take the Quiz';
+      quizToggleBtn.classList.toggle('open', isOpen);
     });
 
-    // --- Embedded Carousel Navigation ---
-    const slides = document.querySelectorAll('.carousel-slide');
+    // --- Carousel Controls & Synchronization ---
+    const track = document.getElementById('track');
+    const slides = document.querySelectorAll('.slide');
     const dots = document.querySelectorAll('.dot');
     const slideNum = document.getElementById('slideNum');
-    const carouselEl = document.getElementById('carousel');
-    let currentSlide = 0;
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
 
-    function showSlide(index) {
-      if (index >= slides.length) currentSlide = 0;
-      else if (index < 0) currentSlide = slides.length - 1;
-      else currentSlide = index;
+    let current = 0;
+    let scrollTimeout = null;
 
-      slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
-      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-      slideNum.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+    function update() {
+      slideNum.textContent = `Slide ${current + 1} of ${slides.length}`;
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === current);
+      });
+      prevBtn.disabled = (current === 0);
+      nextBtn.disabled = (current === slides.length - 1);
     }
 
-    document.getElementById('nextSlide').addEventListener('click', (e) => {
-      e.stopPropagation();
-      showSlide(currentSlide + 1);
+    function goTo(index) {
+      if (index < 0 || index >= slides.length) return;
+      current = index;
+      slides[current].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      update();
+    }
+
+    // 1. Arrow Button Listeners
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+
+    // Dot Navigation
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => goTo(index));
     });
 
-    document.getElementById('prevSlide').addEventListener('click', (e) => {
-      e.stopPropagation();
-      showSlide(currentSlide - 1);
-    });
+    // 3. Debounced Scroll & Swipe Center-Detection
+    track.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const trackCenter = track.getBoundingClientRect().left + track.offsetWidth / 2;
+        let closest = 0;
+        let minDist = Infinity;
 
-    dots.forEach((dot, idx) => {
-      dot.addEventListener('click', () => showSlide(idx));
-    });
+        slides.forEach((slide, index) => {
+          const rect = slide.getBoundingClientRect();
+          const slideCenter = rect.left + rect.width / 2;
+          const dist = Math.abs(trackCenter - slideCenter);
 
-    // --- Two-Finger Laptop Trackpad Swipe ---
-    let wheelDebounce = false;
-    carouselEl.addEventListener('wheel', (e) => {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 25) {
-        e.preventDefault();
-        if (wheelDebounce) return;
-        
-        wheelDebounce = true;
-        if (e.deltaX > 0) {
-          showSlide(currentSlide + 1);
-        } else {
-          showSlide(currentSlide - 1);
-        }
-        
-        setTimeout(() => { wheelDebounce = false; }, 400);
-      }
-    }, { passive: false });
+          if (dist < minDist) {
+            minDist = dist;
+            closest = index;
+          }
+        });
 
-    // --- Mobile Touch Screen Swipe ---
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    carouselEl.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
+        current = closest;
+        update();
+      }, 80);
     }, { passive: true });
 
-    carouselEl.addEventListener('touchend', (e) => {
-      const diffX = touchStartX - e.changedTouches[0].clientX;
-      const diffY = touchStartY - e.changedTouches[0].clientY;
-      const threshold = 35;
-
-      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
-        if (diffX > 0) {
-          showSlide(currentSlide + 1);
-        } else {
-          showSlide(currentSlide - 1);
-        }
-      }
-    }, { passive: true });
+    // Initial setup
+    update();
   </script>
 
 </body>
