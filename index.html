@@ -114,10 +114,6 @@
     background:#fff;
   }
 
-  /* ===== LAPTOP / DESKTOP (default, >1024px) ===== */
-  /* Split view managed by .stage.quiz-open */
-
-  /* ===== TABLET (601px–1024px) ===== */
   @media only screen and (min-width:601px) and (max-width:1024px){
     .stage.quiz-open .pane.slidesMain{ flex:1 1 50%; }
     .stage.quiz-open .pane.quizSide{ flex:1 1 50%; width:auto; }
@@ -125,7 +121,6 @@
     #quizToggle{ font-size:13px; padding:9px 22px; }
   }
 
-  /* ===== PHONE (≤600px) ===== */
   @media only screen and (max-width:600px){
     .stage.quiz-open{ flex-direction:column; }
     .stage.quiz-open .pane.slidesMain{ flex:1 1 50%; border-right:none; border-bottom:1px solid #d7dbe2; }
@@ -144,6 +139,15 @@
   </div>
 
   <div class="stage" id="stage">
+
+    <div class="pane slidesMain">
+      <div class="pane-header">
+        <span>Case Slides</span>
+      </div>
+      <iframe
+        src="https://emaahir2-spec.github.io/caselet-of-the-week/"
+        title="Caselet Carousel" loading="eager"></iframe>
+    </div>
 
     <div class="pane quizSide">
       <div class="pane-header">
