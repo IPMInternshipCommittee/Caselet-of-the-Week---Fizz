@@ -120,7 +120,7 @@
     background:#fff;
   }
 
-  /* --- Carousel & Slide Area Styling --- */
+  /* --- Slide Container with Navy Background --- */
   .slides-content-wrapper{
     max-width:680px;
     margin:0 auto;
@@ -151,11 +151,11 @@
   .carousel-container{
     position:relative;
     width:100%;
-    background:#0b1735; /* Dark navy background for the slide area only */
-    border-radius:8px;
+    background:#0b1735 !important;
+    border-radius:10px;
     overflow:hidden;
-    box-shadow:0 4px 14px rgba(11, 23, 53, 0.2);
-    aspect-ratio: 16 / 9;
+    padding:12px;
+    box-shadow:0 4px 16px rgba(7,55,99,0.18);
   }
   .track{
     display:flex;
@@ -166,6 +166,8 @@
     scrollbar-width:none;
     -ms-overflow-style:none;
     scroll-behavior:smooth;
+    background:#0b1735 !important;
+    border-radius:6px;
   }
   .track::-webkit-scrollbar{
     display:none;
@@ -173,18 +175,20 @@
   .slide{
     flex:0 0 100%;
     width:100%;
-    height:100%;
+    height:auto;
     scroll-snap-align:center;
     display:flex;
     align-items:center;
     justify-content:center;
-    background:#0b1735;
+    background:#0b1735 !important;
   }
   .slide img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
     display:block;
+    width:100%;
+    height:auto;
+    aspect-ratio:3/2;
+    object-fit:contain;
+    border-radius:6px;
     pointer-events:none;
     -webkit-user-drag:none;
     user-select:none;
@@ -196,17 +200,17 @@
     background:rgba(255,255,255,0.92);
     color:var(--navy);
     border:none;
-    width:36px;
-    height:36px;
+    width:34px;
+    height:34px;
     border-radius:50%;
     cursor:pointer;
-    font-size:17px;
+    font-size:16px;
     font-weight:bold;
     display:flex;
     align-items:center;
     justify-content:center;
-    box-shadow:0 2px 8px rgba(0,0,0,0.3);
-    transition:background 0.2s, opacity 0.2s, transform 0.1s;
+    box-shadow:0 2px 6px rgba(0,0,0,0.3);
+    transition:background-color .15s ease, transform .1s ease;
     user-select:none;
     z-index:10;
   }
@@ -216,8 +220,8 @@
     opacity:0;
     pointer-events:none;
   }
-  .carousel-btn.prev{ left:12px; }
-  .carousel-btn.next{ right:12px; }
+  .carousel-btn.prev{ left:8px; }
+  .carousel-btn.next{ right:8px; }
   
   .carousel-dots{
     display:flex;
@@ -359,7 +363,7 @@
       quizToggleBtn.classList.toggle('open', isOpen);
     });
 
-    // --- Carousel Navigation & State Logic ---
+    // --- Carousel Controls & Synchronization ---
     const track = document.getElementById('track');
     const slides = document.querySelectorAll('.slide');
     const dots = document.querySelectorAll('.dot');
@@ -386,16 +390,13 @@
       update();
     }
 
-    // 1. Arrow Button Listeners
     prevBtn.addEventListener('click', () => goTo(current - 1));
     nextBtn.addEventListener('click', () => goTo(current + 1));
 
-    // 2. Dot Listeners
     dots.forEach((dot, index) => {
       dot.addEventListener('click', () => goTo(index));
     });
 
-    // 3. Debounced Trackpad / Touch Center Detection
     track.addEventListener('scroll', () => {
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
@@ -419,7 +420,6 @@
       }, 80);
     }, { passive: true });
 
-    // Initial State Sync
     update();
   </script>
 
