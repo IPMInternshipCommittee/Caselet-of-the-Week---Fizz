@@ -120,7 +120,7 @@
     background:#fff;
   }
 
-  /* --- Slides & Carousel Layout --- */
+  /* --- Carousel & Slide Styling --- */
   .slides-content-wrapper{
     max-width:680px;
     margin:0 auto;
@@ -160,6 +160,13 @@
     align-items:center;
     justify-content:center;
     aspect-ratio: 16 / 9;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
+  }
+  .carousel-container:active{
+    cursor: grabbing;
   }
   .carousel-slide{
     display:none;
@@ -174,6 +181,8 @@
     height:100%;
     object-fit:contain;
     display:block;
+    pointer-events: none;
+    -webkit-user-drag: none;
   }
   .carousel-btn{
     position:absolute;
@@ -255,7 +264,6 @@
 
   <div class="stage" id="stage">
 
-    <!-- Native Slides Pane (No external iframe dependency) -->
     <div class="pane slidesMain">
       <div class="pane-header">
         <span>Case Slides</span>
@@ -303,7 +311,6 @@
       </div>
     </div>
 
-    <!-- Quiz Pane -->
     <div class="pane quizSide">
       <div class="pane-header">
         <span>Quiz</span>
@@ -322,63 +329,71 @@
   </div>
 
   <script>
-  // --- Split Pane Layout Toggle ---
-  const stage = document.getElementById('stage');
-  const btn = document.getElementById('quizToggle');
-  const quizFrame = document.getElementById('quizFrame');
-  let quizLoaded = false;
+    // --- Split Pane Layout Toggle ---
+    const stage = document.getElementById('stage');
+    const btn = document.getElementById('quizToggle');
+    const quizFrame = document.getElementById('quizFrame');
+    let quizLoaded = false;
 
-  btn.addEventListener('click', () => {
-    const isOpen = stage.classList.toggle('quiz-open');
+    btn.addEventListener('click', () => {
+      const isOpen = stage.classList.toggle('quiz-open');
 
-    if (isOpen && !quizLoaded) {
-      quizFrame.src = quizFrame.dataset.src;
-      quizLoaded = true;
+      if (isOpen && !quizLoaded) {
+        quizFrame.src = quizFrame.dataset.src;
+        quizLoaded = true;
+      }
+
+      btn.textContent = isOpen ? '✕ Hide Quiz' : '📝 Take the Quiz';
+      btn.classList.toggle('open', isOpen);
+    });
+
+    // --- Embedded Carousel Navigation ---
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.dot');
+    const slideNum = document.getElementById('slideNum');
+    const carouselEl = document.getElementById('carousel');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+      if (index >= slides.length) currentSlide = 0;
+      else if (index < 0) currentSlide = slides.length - 1;
+      else currentSlide = index;
+
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+      slideNum.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
     }
 
-    btn.textContent = isOpen ? '✕ Hide Quiz' : '📝 Take the Quiz';
-    btn.classList.toggle('open', isOpen);
-  });
+    document.getElementById('nextSlide').addEventListener('click', () => showSlide(currentSlide + 1));
+    document.getElementById('prevSlide').addEventListener('click', () => showSlide(currentSlide - 1));
+    dots.forEach((dot, idx) => dot.addEventListener('click', () => showSlide(idx)));
 
-  // --- Embedded Carousel Navigation ---
-  const slides = document.querySelectorAll('.carousel-slide');
-  const dots = document.querySelectorAll('.dot');
-  const slideNum = document.getElementById('slideNum');
-  const carouselEl = document.getElementById('carousel');
-  let currentSlide = 0;
+    // --- Universal Pointer Swipe Gestures (Touch + Mouse Drag) ---
+    let startX = 0;
+    let isPointerDown = false;
 
-  function showSlide(index) {
-    if (index >= slides.length) currentSlide = 0;
-    else if (index < 0) currentSlide = slides.length - 1;
-    else currentSlide = index;
+    carouselEl.addEventListener('pointerdown', (e) => {
+      isPointerDown = true;
+      startX = e.clientX;
+    });
 
-    slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
-    dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-    slideNum.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
-  }
+    carouselEl.addEventListener('pointerup', (e) => {
+      if (!isPointerDown) return;
+      isPointerDown = false;
+      const diff = startX - e.clientX;
+      const threshold = 35; // minimum px movement to register swipe
 
-  document.getElementById('nextSlide').addEventListener('click', () => showSlide(currentSlide + 1));
-  document.getElementById('prevSlide').addEventListener('click', () => showSlide(currentSlide - 1));
-  dots.forEach((dot, idx) => dot.addEventListener('click', () => showSlide(idx)));
+      if (diff > threshold) {
+        showSlide(currentSlide + 1); // Swiped/dragged left -> next slide
+      } else if (diff < -threshold) {
+        showSlide(currentSlide - 1); // Swiped/dragged right -> previous slide
+      }
+    });
 
-  // --- Touch Swipe Listeners ---
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  carouselEl.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-  }, { passive: true });
-
-  carouselEl.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    const threshold = 40;
-    if (touchStartX - touchEndX > threshold) {
-      showSlide(currentSlide + 1);
-    } else if (touchEndX - touchStartX > threshold) {
-      showSlide(currentSlide - 1);
-    }
-  }, { passive: true });
-</script>
+    carouselEl.addEventListener('pointercancel', () => {
+      isPointerDown = false;
+    });
+  </script>
 
 </body>
 </html>
