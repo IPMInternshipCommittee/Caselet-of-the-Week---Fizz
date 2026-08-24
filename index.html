@@ -120,7 +120,7 @@
     background:#fff;
   }
 
-  /* --- Slide Container with Navy Background --- */
+  /* --- Slide Area Styling (Navy Frame, Clean Fit) --- */
   .slides-content-wrapper{
     max-width:680px;
     margin:0 auto;
@@ -152,10 +152,11 @@
     position:relative;
     width:100%;
     background:#0b1735 !important;
-    border-radius:10px;
+    border-radius:8px;
     overflow:hidden;
-    padding:12px;
-    box-shadow:0 4px 16px rgba(7,55,99,0.18);
+    box-shadow:0 4px 16px rgba(11,23,53,0.3);
+    aspect-ratio:3/2;
+    border:none;
   }
   .track{
     display:flex;
@@ -167,7 +168,6 @@
     -ms-overflow-style:none;
     scroll-behavior:smooth;
     background:#0b1735 !important;
-    border-radius:6px;
   }
   .track::-webkit-scrollbar{
     display:none;
@@ -175,7 +175,7 @@
   .slide{
     flex:0 0 100%;
     width:100%;
-    height:auto;
+    height:100%;
     scroll-snap-align:center;
     display:flex;
     align-items:center;
@@ -185,13 +185,12 @@
   .slide img{
     display:block;
     width:100%;
-    height:auto;
-    aspect-ratio:3/2;
+    height:100%;
     object-fit:contain;
-    border-radius:6px;
     pointer-events:none;
     -webkit-user-drag:none;
     user-select:none;
+    background:#0b1735 !important;
   }
   .carousel-btn{
     position:absolute;
@@ -209,8 +208,8 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    box-shadow:0 2px 6px rgba(0,0,0,0.3);
-    transition:background-color .15s ease, transform .1s ease;
+    box-shadow:0 2px 8px rgba(0,0,0,0.35);
+    transition:background-color .15s ease, opacity .2s ease;
     user-select:none;
     z-index:10;
   }
@@ -220,8 +219,8 @@
     opacity:0;
     pointer-events:none;
   }
-  .carousel-btn.prev{ left:8px; }
-  .carousel-btn.next{ right:8px; }
+  .carousel-btn.prev{ left:10px; }
+  .carousel-btn.next{ right:10px; }
   
   .carousel-dots{
     display:flex;
@@ -345,7 +344,6 @@
   </div>
 
   <script>
-    // --- Split Pane Layout Toggle ---
     const stage = document.getElementById('stage');
     const quizToggleBtn = document.getElementById('quizToggle');
     const quizFrame = document.getElementById('quizFrame');
@@ -363,7 +361,6 @@
       quizToggleBtn.classList.toggle('open', isOpen);
     });
 
-    // --- Carousel Controls & Synchronization ---
     const track = document.getElementById('track');
     const slides = document.querySelectorAll('.slide');
     const dots = document.querySelectorAll('.dot');
