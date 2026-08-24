@@ -120,7 +120,7 @@
     background:#fff;
   }
 
-  /* --- Embedded Slides & Carousel Styling --- */
+  /* --- Slides & Carousel Layout --- */
   .slides-content-wrapper{
     max-width:680px;
     margin:0 auto;
@@ -151,10 +151,11 @@
   .carousel-container{
     position:relative;
     width:100%;
-    background:#0b1735;
+    background:#ffffff;
+    border:1px solid #d7dbe2;
     border-radius:8px;
     overflow:hidden;
-    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -178,9 +179,9 @@
     position:absolute;
     top:50%;
     transform:translateY(-50%);
-    background:rgba(255,255,255,0.85);
+    background:rgba(255,255,255,0.9);
     color:var(--navy);
-    border:none;
+    border:1px solid #d7dbe2;
     width:36px;
     height:36px;
     border-radius:50%;
@@ -190,11 +191,12 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    transition:background 0.2s;
+    transition:background 0.2s, transform 0.1s;
     user-select:none;
     z-index:2;
   }
   .carousel-btn:hover{ background:#ffffff; }
+  .carousel-btn:active{ transform:translateY(-50%) scale(0.95); }
   .carousel-btn.prev{ left:12px; }
   .carousel-btn.next{ right:12px; }
   
@@ -253,7 +255,7 @@
 
   <div class="stage" id="stage">
 
-    <!-- Native Slides Pane -->
+    <!-- Native Slides Pane (No external iframe dependency) -->
     <div class="pane slidesMain">
       <div class="pane-header">
         <span>Case Slides</span>
@@ -268,19 +270,19 @@
           <button class="carousel-btn prev" id="prevSlide" aria-label="Previous slide">&#8592;</button>
           
           <div class="carousel-slide active">
-            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 1">
+            <img src="./1.png" alt="Slide 1">
           </div>
           <div class="carousel-slide">
-            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 2">
+            <img src="./2.png" alt="Slide 2">
           </div>
           <div class="carousel-slide">
-            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 3">
+            <img src="./3.png" alt="Slide 3">
           </div>
           <div class="carousel-slide">
-            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 4">
+            <img src="./4.png" alt="Slide 4">
           </div>
           <div class="carousel-slide">
-            <img src="https://lh3.googleusercontent.com/d/1qb3a0e746vXLuIyad4yfwITnuWLVEYeT" alt="Slide 5">
+            <img src="./5.png" alt="Slide 5">
           </div>
 
           <button class="carousel-btn next" id="nextSlide" aria-label="Next slide">&#8594;</button>
@@ -320,7 +322,7 @@
   </div>
 
   <script>
-    // --- Layout Split Toggle ---
+    // --- Split Pane Layout Toggle ---
     const stage = document.getElementById('stage');
     const btn = document.getElementById('quizToggle');
     const quizFrame = document.getElementById('quizFrame');
@@ -338,7 +340,7 @@
       btn.classList.toggle('open', isOpen);
     });
 
-    // --- Embedded Carousel Logic ---
+    // --- Embedded Carousel Navigation ---
     const slides = document.querySelectorAll('.carousel-slide');
     const dots = document.querySelectorAll('.dot');
     const slideNum = document.getElementById('slideNum');
